@@ -1,0 +1,14 @@
+{
+  "groups": [{
+    "name": "hello",
+    "type": "com.example.HelloProperties",
+    "sourceType": "com.example.HelloProperties"
+  }],
+  "properties": [{
+    "name": "hello.greeting",
+    "type": "java.lang.String",
+    "description": "Greeting message returned by the Hello Rest service.",
+    "sourceType": "com.example.HelloProperties"
+  }],
+  "hints": []
+}
