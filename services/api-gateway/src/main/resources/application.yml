@@ -1,5 +1,5 @@
 server:
-  port: ${SERVICE_PORT:80}
+  port: ${SERVICE_PORT:5555}
 
 spring:
   application:
@@ -17,7 +17,7 @@ eureka:
     ip-address: ${HOST_IP:localhost}
     prefer-ip-address: true
     metadataMap:
-      instanceId: ${spring.application.name}:${SERVICE_PORT:80}
+      instanceId: ${spring.application.name}:${SERVICE_PORT:5555}
     
 logging:
   path: /var/log/
