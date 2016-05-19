@@ -19,7 +19,6 @@ import api_gateway.Utils;
 import api_gateway.controller.GatewayController;
 import edu.cmu.ini.ericsson.practicum.models.movieService.Movie;
 import edu.cmu.ini.ericsson.practicum.models.movieService.MovieList;
-import rx.Observable;
 
 @Service
 public class MovieIntegrationService {
