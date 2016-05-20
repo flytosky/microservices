@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import rx.Observable;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
+// import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
 
 import api_gateway.Utils;
 import api_gateway.controller.GatewayController;
@@ -22,28 +22,41 @@ public class SimilarMovieIntegrationService {
 	@Autowired
     RestTemplate restTemplate;
 
-	@HystrixCommand(fallbackMethod = "stubSimilarMovie")
-    public Observable<SimilarMovie> getSimilarMovie(final String mID, final String trace_uuid) {
+	// @HystrixCommand(fallbackMethod = "stubSimilarMovie")
+ //    public Observable<SimilarMovie> getSimilarMovie(final String mID, final String trace_uuid) {
+	// 	Utils.trace_log("api_gateway/movie/"+mID,"api_gateway", "similar_movie_service",
+	// 			trace_uuid, GatewayController.class);
+ //        return new ObservableResult<SimilarMovie>() {
+ //            @Override
+ //            public SimilarMovie invoke() {
+ //                return restTemplate.getForObject("http://similar-movies/similar-movie/{mID}/{trace_uuid}",
+ //                		SimilarMovie.class, mID, trace_uuid);
+ //            }
+ //        };
+ //    }
+
+    @HystrixCommand(fallbackMethod = "stubSimilarMovie")
+    public SimilarMovie getSimilarMovie(final String mID, final String trace_uuid) {
 		Utils.trace_log("api_gateway/movie/"+mID,"api_gateway", "similar_movie_service",
 				trace_uuid, GatewayController.class);
-        return new ObservableResult<SimilarMovie>() {
-            @Override
-            public SimilarMovie invoke() {
-                return restTemplate.getForObject("http://similar-movies/similar-movie/{mID}/{trace_uuid}",
+        return restTemplate.getForObject("http://similar-movies/similar-movie/{mID}/{trace_uuid}",
                 		SimilarMovie.class, mID, trace_uuid);
-            }
-        };
     }
 	
-	 @HystrixCommand(fallbackMethod = "stubSimilarMovieList")
-	    public Observable<SimilarMovieList> getSimilarMovieList(final String n) {
-	        return new ObservableResult<SimilarMovieList>() {
-	            @Override
-	            public SimilarMovieList invoke() {
-	                return restTemplate.getForObject("http://similar-movies/similar-movie/latest/{n}", SimilarMovieList.class, n);
-	            }
-	        };
-	    }
+	// @HystrixCommand(fallbackMethod = "stubSimilarMovieList")
+	//     public Observable<SimilarMovieList> getSimilarMovieList(final String n) {
+	//         return new ObservableResult<SimilarMovieList>() {
+	//             @Override
+	//             public SimilarMovieList invoke() {
+	//                 return restTemplate.getForObject("http://similar-movies/similar-movie/latest/{n}", SimilarMovieList.class, n);
+	//             }
+	//         };
+	//     }
+
+	@HystrixCommand(fallbackMethod = "stubSimilarMovieList")
+	public SimilarMovieList getSimilarMovieList(final String n) {
+	    return restTemplate.getForObject("http://similar-movies/similar-movie/latest/{n}", SimilarMovieList.class, n);
+	}	        
 
 	private SimilarMovie stubSimilarMovie(final String mID,final String trace_uuid) {
 		SimilarMovie stub = new SimilarMovie();

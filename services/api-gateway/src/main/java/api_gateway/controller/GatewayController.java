@@ -23,8 +23,15 @@ import api_gateway.services.ratings.RatingIntegrationService;
 import api_gateway.services.similar_movie.SimilarMovieIntegrationService;
 import edu.cmu.ini.ericsson.practicum.models.apiGatewayService.MovieDetails;
 import edu.cmu.ini.ericsson.practicum.models.apiGatewayService.MovieDetailsList;
-import edu.cmu.ini.ericsson.practicum.models.movieService.Movie;
+
 import edu.cmu.ini.ericsson.practicum.models.userService.User;
+import edu.cmu.ini.ericsson.practicum.models.movieService.Movie;
+import edu.cmu.ini.ericsson.practicum.models.ratingsService.Rating;
+import edu.cmu.ini.ericsson.practicum.models.similarMovieService.SimilarMovie;
+
+import edu.cmu.ini.ericsson.practicum.models.movieService.MovieList;
+import edu.cmu.ini.ericsson.practicum.models.ratingsService.RatingList;
+import edu.cmu.ini.ericsson.practicum.models.similarMovieService.SimilarMovieList;
 
 @RestController
 @RequestMapping("/movie")
@@ -42,41 +49,45 @@ public class GatewayController {
     @Autowired
     UserIntegrationService userIntegrationService;
     
+//    @RequestMapping(value="{mID}", method=RequestMethod.GET)
+//    public DeferredResult<MovieDetails> getMovieDetails(@PathVariable String mID) {
+//    	String uuid = UUID.randomUUID().toString();
+//        Observable<MovieDetails> details = Observable.zip(
+//			movieIntegrationService.getMovie(mID, uuid),
+//			ratingIntegrationService.ratingFor(mID, uuid),
+//			similarMovieIntegrationService.getSimilarMovie(mID, uuid),
+//            (movie, ratings, similars) -> {
+//                MovieDetails movieDetails = new MovieDetails();
+//                movieDetails.setMovie(movie);
+//                movieDetails.setRatings(ratings);
+//                movieDetails.setSimilars(similars);
+//                return movieDetails;
+//            }
+//        );
+//        return toDeferredResult(details);
+//    }
+    
     @RequestMapping(value="{mID}", method=RequestMethod.GET)
     public DeferredResult<MovieDetails> getMovieDetails(@PathVariable String mID) {
     	String uuid = UUID.randomUUID().toString();
-        Observable<MovieDetails> details = Observable.zip(
-			movieIntegrationService.getMovie(mID, uuid),
-			ratingIntegrationService.ratingFor(mID, uuid),
-			similarMovieIntegrationService.getSimilarMovie(mID, uuid),
-            (movie, ratings, similars) -> {
-                MovieDetails movieDetails = new MovieDetails();
-                movieDetails.setMovie(movie);
-                movieDetails.setRatings(ratings);
-                movieDetails.setSimilars(similars);
-                return movieDetails;
-            }
-        );
-        return toDeferredResult(details);
+    	
+    	MovieDetails movieDetails = new MovieDetails();
+    	
+    	Movie movie = movieIntegrationService.getMovie(mID, uuid);
+    	List<Rating> ratings = ratingIntegrationService.ratingFor(mID, uuid);
+    	SimilarMovie similars = similarMovieIntegrationService.getSimilarMovie(mID, uuid);
+    	
+    	movieDetails.setMovie(movie);
+    	movieDetails.setRatings(ratings);
+    	movieDetails.setSimilars(similars);
+    	
+        return toDeferredResult(movieDetails);
     }
 
-    public DeferredResult<MovieDetails> toDeferredResult(Observable<MovieDetails> details) {
-        DeferredResult<MovieDetails> result = new DeferredResult<>();
-        details.subscribe(new Observer<MovieDetails>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-            }
-
-            @Override
-            public void onNext(MovieDetails movieDetails) {
-                result.setResult(movieDetails);
-            }
-        });
-        return result;
+    public DeferredResult<MovieDetails> toDeferredResult(MovieDetails details) {
+        DeferredResult<MovieDetails> deferredResult = new DeferredResult<>();
+        deferredResult.setResult(details);
+        return deferredResult;
     }
     
     @RequestMapping(method = RequestMethod.POST)
@@ -86,66 +97,81 @@ public class GatewayController {
     
     @RequestMapping(value="/user/{mID}", method=RequestMethod.GET)
     public DeferredResult<User> getUser(@PathVariable String mID) {
-        Observable<User> user = userIntegrationService.getUser(mID);
+        User user = userIntegrationService.getUser(mID);
         return toDeferredResultUser(user);
     }
 
-    public DeferredResult<User> toDeferredResultUser(Observable<User> user) {
-        DeferredResult<User> result = new DeferredResult<>();
-        user.subscribe(new Observer<User>() {
-        	 @Override
-             public void onCompleted() {
-             }
-
-             @Override
-             public void onError(Throwable throwable) {
-             }
-            
-             public void onNext(User user) {
-                result.setResult(user);
-             }	
-        });
-        return result;
+    public DeferredResult<User> toDeferredResultUser(User user) {
+    	DeferredResult<User> deferredResult = new DeferredResult<>();
+        deferredResult.setResult(user);
+        return deferredResult;
     }
+    
+//    @RequestMapping(value="/latest/{n}", method=RequestMethod.GET)
+//    public DeferredResult<MovieDetailsList> getMovieListDetails(@PathVariable String n) { 	
+//    	Observable<MovieDetailsList> details = Observable.zip(
+//    			movieIntegrationService.getMovieList(n),
+//    			ratingIntegrationService.getRatingList(n),
+//    			similarMovieIntegrationService.getSimilarMovieList(n),
+//                (movie, ratings, similars) -> {
+//                	List<MovieDetails> list = new ArrayList<MovieDetails>();
+//                	for(int i = 0; i < Integer.parseInt(n); i++) {
+//                		 MovieDetails movieDetails = new MovieDetails();
+//                         movieDetails.setMovie(movie.getMovie().get(i));
+//                         movieDetails.setRatings(ratings.getList().get(i));
+//                         movieDetails.setSimilars(similars.getSimilarMovieList().get(i));
+//                         list.add(movieDetails);
+//                	}
+//                   
+//                    return new MovieDetailsList(list);
+//                }
+//            );
+//        return toDeferredListResult(details);
+//    }
     
     @RequestMapping(value="/latest/{n}", method=RequestMethod.GET)
     public DeferredResult<MovieDetailsList> getMovieListDetails(@PathVariable String n) { 	
-    	Observable<MovieDetailsList> details = Observable.zip(
-    			movieIntegrationService.getMovieList(n),
-    			ratingIntegrationService.getRatingList(n),
-    			similarMovieIntegrationService.getSimilarMovieList(n),
-                (movie, ratings, similars) -> {
-                	List<MovieDetails> list = new ArrayList<MovieDetails>();
-                	for(int i = 0; i < Integer.parseInt(n); i++) {
-                		 MovieDetails movieDetails = new MovieDetails();
-                         movieDetails.setMovie(movie.getMovie().get(i));
-                         movieDetails.setRatings(ratings.getList().get(i));
-                         movieDetails.setSimilars(similars.getSimilarMovieList().get(i));
-                         list.add(movieDetails);
-                	}
-                   
-                    return new MovieDetailsList(list);
-                }
-            );
-        return toDeferredListResult(details);
+   	
+        MovieList movie = movieIntegrationService.getMovieList(n);
+        RatingList ratings = ratingIntegrationService.getRatingList(n);
+        SimilarMovieList similars = similarMovieIntegrationService.getSimilarMovieList(n);
+        
+        List<MovieDetails> list = new ArrayList<MovieDetails>();
+    	for (int i = 0; i < Integer.parseInt(n); i++) {
+    		 MovieDetails movieDetails = new MovieDetails();
+    		 
+             movieDetails.setMovie(movie.getMovie().get(i));
+             movieDetails.setRatings(ratings.getList().get(i));
+             movieDetails.setSimilars(similars.getSimilarMovieList().get(i));
+             
+             list.add(movieDetails);
+    	}
+    	
+    	MovieDetailsList details = new MovieDetailsList(list);
+    	
+    	return toDeferredListResult(details);
     }
 
-	public DeferredResult<MovieDetailsList> toDeferredListResult(Observable<MovieDetailsList> details) {
-		DeferredResult<MovieDetailsList> result = new DeferredResult<>();
-		details.subscribe(new Observer<MovieDetailsList>() {
-			@Override
-			public void onCompleted() {
-			}
-
-			@Override
-			public void onError(Throwable throwable) {
-			}
-
-			@Override
-			public void onNext(MovieDetailsList movieDetails) {
-				result.setResult(movieDetails);
-			}
-		});
-		return result;
+	public DeferredResult<MovieDetailsList> toDeferredListResult(MovieDetailsList details) {
+//		DeferredResult<MovieDetailsList> result = new DeferredResult<>();
+//		details.subscribe(new Observer<MovieDetailsList>() {
+//			@Override
+//			public void onCompleted() {
+//			}
+//
+//			@Override
+//			public void onError(Throwable throwable) {
+//			}
+//
+//			@Override
+//			public void onNext(MovieDetailsList movieDetails) {
+//				result.setResult(movieDetails);
+//			}
+//		});
+//		return result;
+		
+		DeferredResult<MovieDetailsList> deferredResult = new DeferredResult<>();
+        deferredResult.setResult(details);
+        return deferredResult;
 	}
 }

@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
+// import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
 
 import api_gateway.Utils;
 import api_gateway.controller.GatewayController;
@@ -26,16 +26,23 @@ public class MovieIntegrationService {
 	@Autowired
     RestTemplate restTemplate;
 
-	@HystrixCommand(fallbackMethod = "stubMovie")
-    public Observable<Movie> getMovie(final String mID, final String trace_uuid) {
+	// @HystrixCommand(fallbackMethod = "stubMovie")
+ //    public Observable<Movie> getMovie(final String mID, final String trace_uuid) {
+	// 	Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "movie_service", trace_uuid, GatewayController.class);
+ //        return new ObservableResult<Movie>() {
+ //            @Override
+ //            public Movie invoke() {
+ //                return restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",
+ //                		Movie.class, mID, trace_uuid);
+ //            }
+ //        };
+ //    }
+
+    @HystrixCommand(fallbackMethod = "stubMovie")
+    public Movie getMovie(final String mID, final String trace_uuid) {
 		Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "movie_service", trace_uuid, GatewayController.class);
-        return new ObservableResult<Movie>() {
-            @Override
-            public Movie invoke() {
-                return restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",
-                		Movie.class, mID, trace_uuid);
-            }
-        };
+        return restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",
+        	Movie.class, mID, trace_uuid);
     }
 	
 	@HystrixCommand(fallbackMethod = "stubPostMovie")
@@ -43,14 +50,19 @@ public class MovieIntegrationService {
 		return restTemplate.postForObject("http://movies/movie", movie, Movie.class);
 	}
 
-	@HystrixCommand(fallbackMethod = "stubMovieList")
-    public Observable<MovieList> getMovieList(final String n) {
-        return new ObservableResult<MovieList>() {
-            @Override
-            public MovieList invoke() {
-                return restTemplate.getForObject("http://movies/movie/latest/{n}", MovieList.class, n);
-            }
-        };
+	// @HystrixCommand(fallbackMethod = "stubMovieList")
+ //    public Observable<MovieList> getMovieList(final String n) {
+ //        return new ObservableResult<MovieList>() {
+ //            @Override
+ //            public MovieList invoke() {
+ //                return restTemplate.getForObject("http://movies/movie/latest/{n}", MovieList.class, n);
+ //            }
+ //        };
+ //    }
+
+    @HystrixCommand(fallbackMethod = "stubMovieList")
+    public MovieList getMovieList(final String n) {
+        return restTemplate.getForObject("http://movies/movie/latest/{n}", MovieList.class, n);
     }
 	
 	private Movie stubPostMovie(Movie movie) {

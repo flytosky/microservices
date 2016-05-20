@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
+// import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
 
 import api_gateway.Utils;
 import api_gateway.controller.GatewayController;
@@ -25,27 +25,40 @@ public class RatingIntegrationService {
     @Autowired
     RestTemplate restTemplate;
 
+    // @HystrixCommand(fallbackMethod = "stubRating")
+    // public Observable<List<Rating>> ratingFor(String mID, String trace_uuid) {
+    // 	Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "rating_service", trace_uuid, GatewayController.class);
+    //     return new ObservableResult<List<Rating>>() {
+    //         @Override
+    //         public List<Rating> invoke() {
+    //             ParameterizedTypeReference<List<Rating>> responseType = new ParameterizedTypeReference<List<Rating>>() {};
+    //             return restTemplate.exchange("http://rating/movie/{mID}/{trace_uuid}",
+    //             		HttpMethod.GET, null, responseType, mID, trace_uuid).getBody();
+    //         }
+    //     };
+    // 
+
     @HystrixCommand(fallbackMethod = "stubRating")
-    public Observable<List<Rating>> ratingFor(String mID, String trace_uuid) {
-    	Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "rating_service", trace_uuid, GatewayController.class);
-        return new ObservableResult<List<Rating>>() {
-            @Override
-            public List<Rating> invoke() {
-                ParameterizedTypeReference<List<Rating>> responseType = new ParameterizedTypeReference<List<Rating>>() {};
-                return restTemplate.exchange("http://rating/movie/{mID}/{trace_uuid}",
-                		HttpMethod.GET, null, responseType, mID, trace_uuid).getBody();
-            }
-        };
+    public List<Rating> ratingFor(String mID, String trace_uuid) {
+        Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "rating_service", trace_uuid, GatewayController.class);
+        ParameterizedTypeReference<List<Rating>> responseType = new ParameterizedTypeReference<List<Rating>>() {};
+        return restTemplate.exchange("http://rating/movie/{mID}/{trace_uuid}", 
+        		HttpMethod.GET, null, responseType, mID, trace_uuid).getBody();
     }
 
+    // @HystrixCommand(fallbackMethod = "stubRatingList")
+    // public Observable<RatingList> getRatingList(final String n) {
+    //     return new ObservableResult<RatingList>() {
+    //         @Override
+    //         public RatingList invoke() {
+    //             return restTemplate.getForObject("http://rating/movie/latest/{n}", RatingList.class, n);
+    //         }
+    //     };
+    // }
+    
     @HystrixCommand(fallbackMethod = "stubRatingList")
-    public Observable<RatingList> getRatingList(final String n) {
-        return new ObservableResult<RatingList>() {
-            @Override
-            public RatingList invoke() {
-                return restTemplate.getForObject("http://rating/movie/latest/{n}", RatingList.class, n);
-            }
-        };
+    public RatingList getRatingList(final String n) {
+        return restTemplate.getForObject("http://rating/movie/latest/{n}", RatingList.class, n);
     }
     
     private List<Rating> stubRating(String mID, String trace_uuid) {
