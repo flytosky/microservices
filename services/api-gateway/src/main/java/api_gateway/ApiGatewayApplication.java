@@ -4,7 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -15,6 +14,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +28,18 @@ import org.springframework.web.client.RestTemplate;
 @EnableCircuitBreaker
 @EnableEurekaClient
 public class ApiGatewayApplication {
-
+    
+	@Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+	
     public static void main(String[] args) {
-        // SpringApplication.run(ApiGatewayApplication.class, args);
-        new SpringApplicationBuilder(ApiGatewayApplication.class).web(true).run(args);
+         try {
+        	 SpringApplication.run(ApiGatewayApplication.class, args);
+         } catch (com.netflix.hystrix.exception.HystrixBadRequestException e) {
+        	 e.printStackTrace();
+         }
+        // new SpringApplicationBuilder(ApiGatewayApplication.class).web(true).run(args);
     }
 }
