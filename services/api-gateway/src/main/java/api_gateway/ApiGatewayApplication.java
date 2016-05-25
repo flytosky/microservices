@@ -23,12 +23,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 
 @SpringBootApplication
 @EnableCircuitBreaker
 @EnableEurekaClient
 public class ApiGatewayApplication {
     
+	@LoadBalanced
 	@Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -37,6 +39,7 @@ public class ApiGatewayApplication {
     public static void main(String[] args) {
          try {
         	 SpringApplication.run(ApiGatewayApplication.class, args);
+        	 //new SpringApplicationBuilder(ApiGatewayApplication.class).web(true).run(args);
          } catch (com.netflix.hystrix.exception.HystrixBadRequestException e) {
         	 e.printStackTrace();
          }

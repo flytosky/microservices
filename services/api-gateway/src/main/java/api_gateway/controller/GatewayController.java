@@ -71,9 +71,15 @@ public class GatewayController {
     public DeferredResult<MovieDetails> getMovieDetails(@PathVariable String mID) {
     	String uuid = UUID.randomUUID().toString();
     	
+    	System.out.println("mID: " + mID);
+    	System.out.println("uuid: " + uuid);
+    	
     	MovieDetails movieDetails = new MovieDetails();
     	
     	Movie movie = movieIntegrationService.getMovie(mID, uuid);
+    	System.out.println("----------------");
+    	System.out.println("movie: " + movie);
+    	System.out.println("----------------");
     	List<Rating> ratings = ratingIntegrationService.ratingFor(mID, uuid);
     	SimilarMovie similars = similarMovieIntegrationService.getSimilarMovie(mID, uuid);
     	
