@@ -34,16 +34,16 @@ public class MovieController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "{omdbid}/{trace_uuid}")
 	public Movie getMovie(@PathVariable String omdbid, @PathVariable String trace_uuid) {
-		System.out.println("-------------3");
-		System.out.println("Movie ID:" + omdbid);
+//		System.out.println("-------------3");
+//		System.out.println("Movie ID:" + omdbid);
 		Movie movie = repository.findByOmdbid(omdbid);
-		System.out.println("-------------4");
-		System.out.println("Movie:" + movie);
-		System.out.println("-------------5");
+//		System.out.println("-------------4");
+//		System.out.println("Movie:" + movie);
+//		System.out.println("-------------5");
 		Utils.trace_log("movie_service/movie/"+omdbid, "movie_service", "image_service", trace_uuid, MovieController.class);
 		Image image = restTemplate.getForObject("http://images/image/get/{id}/{trace_uuid}",
 				Image.class, omdbid, trace_uuid);
-		System.out.println("-------------6");
+//		System.out.println("-------------6");
 		movie.setPoster(image.getImage());
 		return movie;
 	}

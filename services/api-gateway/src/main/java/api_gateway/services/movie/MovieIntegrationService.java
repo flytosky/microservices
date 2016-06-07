@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.springframework.cloud.sleuth.SpanName;;
 // import com.netflix.hystrix.contrib.javanica.command.ObservableResult;
 
 
@@ -22,6 +23,7 @@ import edu.cmu.ini.ericsson.practicum.models.movieService.Movie;
 import edu.cmu.ini.ericsson.practicum.models.movieService.MovieList;
 
 @Service
+@SpanName("test")
 public class MovieIntegrationService {
 	
 	@Autowired
@@ -43,10 +45,10 @@ public class MovieIntegrationService {
     public Movie getMovie(final String mID, final String trace_uuid) {
 		Utils.trace_log("api_gateway/movie/"+mID, "api_gateway", "movie_service", trace_uuid, GatewayController.class);
 		
-		System.out.println("----------------1");
-    	System.out.println("Get Movie: " + restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",
-            	Movie.class, mID, trace_uuid));
-    	System.out.println("----------------2");
+//		System.out.println("----------------1");
+//    	System.out.println("Get Movie: " + restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",
+//            	Movie.class, mID, trace_uuid));
+//    	System.out.println("----------------2");
 		
 		
 		return restTemplate.getForObject("http://movies/movie/{mID}/{trace_uuid}",

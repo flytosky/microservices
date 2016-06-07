@@ -33,6 +33,10 @@ import edu.cmu.ini.ericsson.practicum.models.movieService.MovieList;
 import edu.cmu.ini.ericsson.practicum.models.ratingsService.RatingList;
 import edu.cmu.ini.ericsson.practicum.models.similarMovieService.SimilarMovieList;
 
+import org.springframework.cloud.sleuth.Tracer;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.sampler.AlwaysSampler;
+
 @RestController
 @RequestMapping("/movie")
 public class GatewayController {
@@ -48,6 +52,9 @@ public class GatewayController {
     
     @Autowired
     UserIntegrationService userIntegrationService;
+    
+    @Autowired
+	private Tracer tracer;
     
 //    @RequestMapping(value="{mID}", method=RequestMethod.GET)
 //    public DeferredResult<MovieDetails> getMovieDetails(@PathVariable String mID) {
@@ -71,8 +78,13 @@ public class GatewayController {
     public DeferredResult<MovieDetails> getMovieDetails(@PathVariable String mID) {
     	String uuid = UUID.randomUUID().toString();
     	
+//    	Span span = this.tracer.createSpan("testSpan",
+//				new AlwaysSampler());
+    	
     	System.out.println("mID: " + mID);
     	System.out.println("uuid: " + uuid);
+    	
+    	this.tracer.addTag("source", "api-gateway");
     	
     	MovieDetails movieDetails = new MovieDetails();
     	

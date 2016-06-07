@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: movies
+  zipkin:
+    # Uncomment to send to zipkin, replacing 192.168.99.100 with your zipkin IP address
+    baseUrl: http://192.168.99.100:9411/
+  sleuth:
+    sampler:
+      percentage: 1.0  
   data:
     mongodb:
       host: ${HOST_IP:localhost}
